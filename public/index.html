@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="fr" class="light">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Réservations — Espace Bien-Être</title>
+<script src="https://cdn.socket.io/4.7.2/socket.io.min.js" crossorigin="anonymous"></script>
+<style>
+:root{--ok:#16a34a;--no:#dc2626;--warn:#f59e0b;--radius:14px;--shadow:0 8px 24px rgba(16,24,40,.06);--ring:0 0 0 3px rgba(99,102,241,.18)}
+:root.palette-teal.light{--accent:#0f766e;--bg:#f5f7fb;--panel:#fff;--muted:#e6f0f0;--border:#cfe3e2;--text:#0f172a;--text-muted:#48606a;--chip:#eef7f7}
+:root.palette-teal.dark {--accent:#14b8a6;--bg:#0b1220;--panel:#111827;--muted:#0f1b24;--border:#1f3940;--text:#e7eaf0;--text-muted:#a7c4c6;--chip:#0d1a1c}
+:root.palette-sage.light{--accent:#3f7f72;--bg:#f6f8f6;--panel:#fff;--muted:#ecf1ee;--border:#d6e0db;--text:#10211c;--text-muted:#566b62;--chip:#f1f5f2}
+:root.palette-sage.dark {--accent:#69a99a;--bg:#0d1412;--panel:#111918;--muted:#0f1614;--border:#1f2a26;--text:#eaf1ee;--text-muted:#aec5bc;--chip:#0f1614}
+:root.palette-sand.light{--accent:#8f6d3f;--bg:#fbfaf7;--panel:#fff;--muted:#f3eee6;--border:#e5dbc9;--text:#201a12;--text-muted:#6b5f51;--chip:#f7f3ec}
+:root.palette-sand.dark {--accent:#caa56f;--bg:#15120e;--panel:#1a1712;--muted:#1a1611;--border:#2a241b;--text:#efeae3;--text-muted:#d2c6b6;--chip:#1a1611}
+:root.palette-slate.light{--accent:#405e8c;--bg:#f5f7fb;--panel:#fff;--muted:#ecf0f7;--border:#d6deea;--text:#0e1726;--text-muted:#53627a;--chip:#f1f4fa}
+:root.palette-slate.dark {--accent:#60a5fa;--bg:#0a101b;--panel:#0f172a;--muted:#0e1526;--border:#1e2a44;--text:#e6ecf8;--text-muted:#b7c4df;--chip:#0e1526}
+:root.dark{color-scheme:dark}
+*{box-sizing:border-box} html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--text);font-family:ui-sans-serif,system-ui,Segoe UI,Roboto;line-height:1.35;transition:background .3s,color .3s}
+.app{max-width:1200px;margin:20px auto;padding:0 16px}
+h1{margin:0 0 12px;font-size:1.7rem} .sub{font-size:.92rem;color:var(--text-muted)}
+input,button,select{padding:10px 12px;border-radius:10px;border:1px solid var(--border);background:var(--panel);color:var(--text);transition:background .2s,border-color .2s,box-shadow .2s}
+input:focus,select:focus,button:focus{outline:none;box-shadow:var(--ring)} button{cursor:pointer} button:hover{background:var(--muted)}
+.btn-danger{border-color:#f3c2c2;color:#b42323;background:var(--panel)} .btn-ghost{background:transparent;border:1px solid transparent;color:var(--text-muted)}
+.hidden{display:none!important}
+.controls{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+.split{display:flex;gap:8px;align-items:center}
+.pill{padding:6px 12px;border:1px solid var(--border);border-radius:999px;background:var(--panel);color:var(--text-muted)}
+.tabs{display:flex;gap:8px;margin:8px 0 16px}
+.tab{padding:8px 12px;border:1px solid var(--border);border-radius:10px;background:var(--panel)}
+.tab.active{background:var(--muted);border-color:var(--border)}
+.two-cols{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}
+.day-col{background:var(--panel);border-radius:14px;padding:14px;box-shadow:var(--shadow)}
+.day-col h2{margin:0 0 4px;font-size:1.15rem;text-transform:capitalize;color:var(--accent)}
+.slot{background:linear-gradient(180deg,var(--panel),color-mix(in oklab,var(--panel) 85%,var(--muted)));border:1px solid var(--border);border-radius:12px;padding:12px;margin:12px 0;transition:transform .08s,background .2s}
+.slot:hover{transform:translateY(-1px)} .slot-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.muted{opacity:.7;color:var(--text-muted)}
+.actions{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+.names{margin-top:8px;display:flex;gap:8px;flex-wrap:wrap}
+.chip{background:var(--chip);border:1px dashed var(--border);border-radius:999px;padding:4px 10px;font-size:.85rem}
+.chip.locked{opacity:.55}
+.badge{font-size:.78rem;padding:3px 10px;border-radius:999px;border:1px solid transparent}
+.ok{background:#e8f8ee;color:#0f7a2a;border-color:#c7efd4}
+.full{background:#ffe9e9;color:#a11212;border-color:#ffd1d1}
+.non{background:#fff2d9;color:#8a5405;border-color:#ffe3b0}
+.table-wrap{overflow:auto;border-radius:12px;border:1px solid var(--border);background:var(--panel);box-shadow:var(--shadow)}
+table{width:100%;border-collapse:separate;border-spacing:0}
+thead th{position:sticky;top:0;background:var(--muted);border-bottom:1px solid var(--border);text-align:left;padding:12px}
+tbody td,tbody th{border-bottom:1px solid var(--border);padding:10px;vertical-align:top}
+tbody th{background:var(--muted);font-weight:700;width:140px}
+td.muted{background:color-mix(in oklab,var(--panel) 85%,var(--muted));color:var(--text-muted)}
+.note{font-size:.86rem;color:var(--text-muted)}
+.toasts{position:fixed;right:16px;bottom:16px;display:flex;flex-direction:column;gap:8px;z-index:9999}
+.toast{min-width:240px;max-width:360px;padding:10px 12px;border-radius:12px;border:1px solid var(--border);background:var(--panel);box-shadow:var(--shadow)}
+.input-suffix{position:relative;display:inline-flex;align-items:center}
+.input-suffix input{padding-right:140px}
+.input-suffix span{position:absolute;right:12px;color:var(--text-muted);pointer-events:none;font-size:.95em}
+.col-grey{background:color-mix(in oklab,var(--panel) 80%,var(--muted));border:1px dashed var(--border);border-radius:8px;min-height:38px}
+td.col-grey{background:color-mix(in oklab,var(--panel) 80%,var(--muted));border-left:1px solid var(--border);border-right:1px solid var(--border)}
+body.day-wide .app{max-width:1440px} @media (min-width:1600px){body.day-wide .app{max-width:1600px}}
+</style>
+</head>
+<body>
+<div class="app">
+  <h1>Réservations — Espace Bien-Être</h1>
+
+  <div class="controls">
+    <div class="split">
+      <button id="prevWeek" title="Semaine précédente">«</button>
+      <input type="date" id="anchor">
+      <button id="nextWeek" title="Semaine suivante">»</button>
+      <span id="rangeLabel" class="pill"></span>
+    </div>
+    <div class="split" style="margin-left:auto">
+      <button id="exportCsv" class="btn-ghost">Exporter CSV</button>
+      <button id="toggleAdmin" class="btn-ghost">Activer Admin</button>
+      <select id="palette" class="btn-ghost">
+        <option value="teal">Teal</option>
+        <option value="sage">Sauge</option>
+        <option value="sand">Sable chaud</option>
+        <option value="slate">Ardoise</option>
+      </select>
+      <button id="openConfig" class="btn-ghost hidden">⚙️ Config</button>
+      <button id="resetAll" class="btn-danger hidden">Réinitialiser</button>
+      <button id="toggleTheme" class="btn-ghost">🌙 Mode nuit</button>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" data-view="week">Vue semaine (Mardi & Mercredi)</button>
+    <button class="tab" data-view="day">Vue tableau (Jour)</button>
+    <span class="sub" id="capacitiesLine"></span>
+  </div>
+
+  <section id="view-week"><div id="grid" class="two-cols"></div></section>
+
+  <section id="view-day" class="hidden">
+    <div class="controls" style="margin-top:8px">
+      <label>Jour :</label>
+      <select id="daySelect"><option value="2">Mardi</option><option value="3">Mercredi</option></select>
+      <span class="sub">← dans la semaine affichée</span>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr id="theadRow"></tr></thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <div id="err" class="banner hidden"></div>
+</div>
+<div class="toasts" id="toasts"></div>
+
+<script>
+/* ===== CONFIG API ===== */
+const API_BASE=""; const ADMIN_SECRET_HEADER_VALUE="INFO0035"; const ADMIN_PIN="1234";
+
+/* ===== STATE / CONFIG ===== */
+let ADMIN_MODE = localStorage.getItem("isAdmin")==="1"; // persiste entre index/config
+let MEMO={}; // { id: {names:[]} }
+let CONFIG=null; let SERVICES=[]; let DEFAULT_CAPACITY={};
+const CLOSED_RANGES=[];
+
+/* ===== DATES UTILS ===== */
+function parseISO(val){ if(!val) return null;
+  if(/^\d{4}-\d{2}-\d{2}$/.test(val)){ const [y,m,d]=val.split("-").map(Number); return new Date(y,m-1,d); }
+  const d=new Date(val); return isNaN(+d)?null:d;
+}
+function fmtDate(d){return d.toISOString().slice(0,10)}
+function dow(d){return d.getDay()}
+function startOfWeekMonday(d){const r=new Date(d); r.setHours(12,0,0,0); r.setDate(r.getDate()-((dow(r)+6)%7)); return r;}
+function addDays(d,n){const r=new Date(d); r.setDate(r.getDate()+n); return r;}
+function snapTuesday(d){const mon=startOfWeekMonday(d); return addDays(mon,1);}
+function isClosed(date){for(const [A,B] of CLOSED_RANGES){const a=parseISO(A),b=parseISO(B); if(date>=a && date<=b) return true;} return false;}
+
+/* ===== PLANS (Mardi/Mercredi) ===== */
+const TUES={amma:[],rv:[],lumo:[],doin:[]};
+const WED ={amma:[],rv:[],lumo:[],doin:[]};
+function schemaForDate(d){return dow(d)===2?TUES:dow(d)===3?WED:null;}
+function compileTimesForDay(schema){
+  const set=new Set(); for(const k in schema){ for(const it of schema[k]){ if(typeof it==="string") set.add(it); else if(it?.t) set.add(it.t); } }
+  const toMin=s=>{const p=s.includes("–")?s.split("–")[0]:s; const [H,M]=p.split(":").map(Number); return H*60+(M||0);}
+  return [...set].sort((a,b)=>toMin(a)-toMin(b));
+}
+function capFor(key){return DEFAULT_CAPACITY[key]??1}
+
+/* ===== VALIDATION EMAIL ===== */
+const EMAIL_RE=/^[a-z]+(?:-[a-z]+)*\.[a-z]+(?:-[a-z]+)*\d*$/i;
+function validateName(raw){
+  let base=String(raw||"").trim().toLowerCase();
+  if(!EMAIL_RE.test(base)) return {ok:false,msg:"Format attendu : prenom.nom ou prenom.nom2"};
+  return {ok:true,name:base+"@cpn-laxou.com"};
+}
+
+/* ===== TOASTS ===== */
+const toasts=document.getElementById("toasts");
+function toast(title,msg,type="ok",ms=2200){
+  const el=document.createElement("div");
+  el.className=`toast ${type}`; el.innerHTML=`<div class="title" style="font-weight:700;margin-bottom:4px">${title}</div><div class="msg" style="font-size:.9rem;color:var(--text-muted)">${msg}</div>`;
+  toasts.appendChild(el); setTimeout(()=>{el.style.opacity="0"; el.style.transform="translateY(6px)";}, ms-300); setTimeout(()=>el.remove(), ms);
+}
+
+/* ===== API CLIENT ===== */
+function adminHeaders(){ return {"X-Admin-Secret":ADMIN_SECRET_HEADER_VALUE}; }
+async function fetchWeekFromServer(tuesday){
+  const wed=addDays(tuesday,1);
+  const r=await fetch(`${API_BASE}/api/week?from=${fmtDate(tuesday)}&to=${fmtDate(wed)}`);
+  if(!r.ok) throw new Error("fetch week failed");
+  const data=await r.json();
+  MEMO={}; (data||[]).forEach(row=>{ MEMO[`${row.date}|${row.service}|${row.slot}`]={names:row.names||[]}; });
+}
+function loadDB(){return MEMO;}
+async function addName(id,name){
+  const r=await fetch(`${API_BASE}/api/slot/${encodeURIComponent(id)}/add`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({name})});
+  if(!r.ok) throw new Error("addName failed");
+}
+async function clearSlot(id){
+  const r=await fetch(`${API_BASE}/api/slot/${encodeURIComponent(id)}`,{method:"DELETE",headers:adminHeaders()});
+  if(!r.ok) throw new Error("clearSlot failed");
+}
+async function removeAt(id,idx){
+  const r=await fetch(`${API_BASE}/api/slot/${encodeURIComponent(id)}/remove`,{method:"POST",headers:{"Content-Type":"application/json",...adminHeaders()},body:JSON.stringify({index:idx})});
+  if(!r.ok) throw new Error("removeAt failed");
+}
+
+/* ===== REALTIME ===== */
+let socket=null;
+function connectRealtime(){
+  if(socket) return;
+  socket=io(API_BASE,{transports:["websocket"]});
+  socket.on("reservations:update",(row)=>{ if(row?.id){ MEMO[row.id]={names:row.names||[]}; renderAll(false);} });
+  socket.on("reservations:delete",({id})=>{ if(id){ delete MEMO[id]; renderAll(false);} });
+  socket.on("reservations:reset",()=>{ MEMO={}; renderAll(false); });
+  socket.on("config:update",(cfg)=>{ applyConfig(cfg); renderAll(true); });
+}
+
+/* ===== RENDER (WEEK & DAY) ===== */
+const grid=document.getElementById("grid");
+const tbody=document.getElementById("tbody");
+const theadRow=document.getElementById("theadRow");
+const errBox=document.getElementById("err");
+const anchor=document.getElementById("anchor");
+const rangeLabel=document.getElementById("rangeLabel");
+const tabs=document.querySelectorAll(".tab");
+const viewWeek=document.getElementById("view-week");
+const viewDay=document.getElementById("view-day");
+const daySelect=document.getElementById("daySelect");
+const resetBtn=document.getElementById("resetAll");
+const openCfgBtn=document.getElementById("openConfig");
+const capacitiesLine=document.getElementById("capacitiesLine");
+
+function setActive(view){
+  tabs.forEach(t=>t.classList.toggle("active",t.dataset.view===view));
+  viewWeek.classList.toggle("hidden",view!=="week");
+  viewDay.classList.toggle("hidden",view!=="day");
+  if(view==="day") document.body.classList.add("day-wide"); else document.body.classList.remove("day-wide");
+}
+function renderWeek(tuesday){
+  const wed=addDays(tuesday,1); grid.innerHTML="";
+  [tuesday,wed].forEach(day=>{
+    const schema=schemaForDate(day);
+    const col=document.createElement("div"); col.className="day-col";
+    const title=day.toLocaleDateString("fr-FR",{weekday:"long",day:"2-digit",month:"2-digit"});
+    col.innerHTML=`<h2>${title}</h2><div class="sub">${isClosed(day)?"Fermé — périodes de congés":"Réservable"}</div>`;
+    if(!schema || isClosed(day)){ col.innerHTML+=`<div class="slot muted"><b>Jour non réservable</b></div>`; grid.appendChild(col); return; }
+
+    const times=compileTimesForDay(schema);
+    for(const t of times){
+      const block=document.createElement("div"); block.className="slot";
+      const chunks=[`<div class="slot-header"><span>🕒 ${t}</span></div>`];
+
+      for(const svc of SERVICES){
+        const list=schema[svc.key]||[]; let slotDef=null;
+        for(const it of list){ if(typeof it==="string" && it===t) slotDef={t:it}; else if(it?.t===t) slotDef=it; }
+        if(svc.grey){chunks.push(`<div class="col-grey" title="${svc.label} — non réservable"></div>`); continue;}
+        if(!slotDef){chunks.push(`<div class="muted">${svc.label} — —</div>`); continue;}
+        if(slotDef.non){chunks.push(`<div><b>${svc.label} :</b> <span class="badge non">NON</span> ${slotDef.note||""}</div>`); continue;}
+        const cap=capFor(svc.key);
+        const id=`${fmtDate(day)}|${svc.key}|${t}`;
+        const state=loadDB()[id]||{names:[]}; const n=state.names.length;
+        const badge=n>=cap?`<span class="badge full">Complet ${n}/${cap}</span>`:`<span class="badge ok">Places ${n}/${cap}</span>`;
+        const names=state.names.map((nm,i)=>`<span class="chip ${ADMIN_MODE?"":"locked"}" ${ADMIN_MODE?`data-remove="${i}" data-id="${id}"`:``}>${nm}${ADMIN_MODE?" ✕":""}</span>`).join("");
+        chunks.push(`
+          <div><b>${svc.label} :</b> ${badge}
+            <div class="actions">
+              <div class="input-suffix"><input type="text" placeholder="prenom.nom" data-in="${id}"><span>@cpn-laxou.com</span></div>
+              <button data-add="${id}" ${n>=cap?"disabled":""}>+</button>
+              ${ADMIN_MODE&&n?`<button data-clear="${id}" class="btn-danger">Vider</button>`:""}
+            </div>
+            <div class="names">${names}</div>
+          </div>
+        `);
+      }
+      block.innerHTML=chunks.join(""); col.appendChild(block);
+    }
+    grid.appendChild(col);
+  });
+
+  grid.querySelectorAll("[data-add]").forEach(b=>{
+    b.onclick=async(e)=>{
+      e.preventDefault();
+      const id=b.getAttribute("data-add");
+      const inp=b.closest(".actions")?.querySelector(`[data-in="${CSS.escape(id)}"]`);
+      const v=validateName((inp?.value||"").trim());
+      if(!v.ok){ toast("Saisie invalide",v.msg,"err"); return; }
+      try{ await addName(id,v.name); toast("Ajouté ✅",`${v.name} a été ajouté(e).`,"ok"); }catch{ toast("Erreur serveur","Impossible d’enregistrer.","err"); }
+    };
+  });
+  grid.querySelectorAll("[data-in]").forEach(inp=>{
+    inp.onkeydown=(ev)=>{ if(ev.key==="Enter"){ ev.preventDefault(); inp.parentElement.querySelector("[data-add]")?.click(); } };
+  });
+  if(ADMIN_MODE){
+    grid.querySelectorAll("[data-clear]").forEach(b=>{
+      b.onclick=async()=>{ try{ await clearSlot(b.getAttribute("data-clear")); toast("Créneau vidé","Toutes les réservations ont été supprimées.","warn"); }catch{ toast("Erreur serveur","Action impossible.","err"); } };
+    });
+    grid.querySelectorAll("[data-remove]").forEach(ch=>{
+      ch.onclick=async()=>{ try{ await removeAt(ch.getAttribute("data-id"), +ch.getAttribute("data-remove")); toast("Supprimé","La réservation a été retirée.","warn"); }catch{ toast("Erreur serveur","Action impossible.","err"); } };
+    });
+  }
+}
+function renderDay(tuesday,dayValue){
+  tbody.innerHTML=""; theadRow.innerHTML="";
+  // head
+  theadRow.innerHTML = `<th>Créneaux</th>`+SERVICES.map(s=>`<th>${s.label}${s.grey?' (grisé)':''}</th>`).join("");
+  const day=addDays(tuesday,dayValue-2);
+  const schema=schemaForDate(day);
+  if(!schema || isClosed(day)){
+    const times=compileTimesForDay(TUES);
+    for(const t of times){
+      const tr=document.createElement("tr"); tr.innerHTML=`<th>${t}</th>`+SERVICES.map(()=>`<td class="muted"><div class="note">Non réservable</div></td>`).join(""); tbody.appendChild(tr);
+    } return;
+  }
+  const times=compileTimesForDay(schema);
+  for(const t of times){
+    const tr=document.createElement("tr"); tr.appendChild(Object.assign(document.createElement("th"),{textContent:t}));
+    for(const svc of SERVICES){
+      const td=document.createElement("td");
+      if(svc.grey){ td.className="col-grey"; td.title="Non réservable"; tr.appendChild(td); continue; }
+      const list=schema[svc.key]||[]; let slotDef=null;
+      for(const it of list){ if(typeof it==="string" && it===t) slotDef={t:it}; else if(it?.t===t) slotDef=it; }
+      if(!slotDef){ td.className="muted"; td.innerHTML=`<div class="note">—</div>`; }
+      else if(slotDef.non){ td.innerHTML=`<span class="badge full">NON</span> ${slotDef.note||""}`; }
+      else{
+        const cap=capFor(svc.key);
+        const id=`${fmtDate(day)}|${svc.key}|${t}`;
+        const state=loadDB()[id]||{names:[]}; const n=state.names.length;
+        const badge=n>=cap?`<span class="badge full">Complet ${n}/${cap}</span>`:`<span class="badge ok">Places ${n}/${cap}</span>`;
+        const names=state.names.map((nm,i)=>`<span class="chip ${ADMIN_MODE?"":"locked"}" ${ADMIN_MODE?`data-remove="${i}" data-id="${id}"`:``}>${nm}${ADMIN_MODE?" ✕":""}</span>`).join("");
+        td.innerHTML=`
+          <div>${badge}</div>
+          <div class="actions">
+            <div class="input-suffix"><input type="text" placeholder="prenom.nom" data-in="${id}"><span>@cpn-laxou.com</span></div>
+            <button data-add="${id}" ${n>=cap?"disabled":""}>Ajouter</button>
+            ${ADMIN_MODE&&n?`<button class="btn-danger" data-clear="${id}">Vider</button>`:""}
+          </div>
+          <div class="names">${names}</div>`;
+      }
+      tr.appendChild(td);
+    }
+    tbody.appendChild(tr);
+  }
+  tbody.querySelectorAll("[data-add]").forEach(b=>{
+    b.onclick=async(e)=>{
+      e.preventDefault();
+      const id=b.getAttribute("data-add");
+      const inp=b.closest(".actions")?.querySelector(`[data-in="${CSS.escape(id)}"]`);
+      const v=validateName((inp?.value||"").trim());
+      if(!v.ok){ toast("Saisie invalide", v.msg,"err"); return; }
+      try{ await addName(id,v.name); toast("Ajouté ✅",`${v.name} a été ajouté(e).`,"ok"); }catch{ toast("Erreur serveur","Impossible d’enregistrer.","err"); }
+    };
+  });
+  tbody.querySelectorAll("[data-in]").forEach(inp=>{
+    inp.onkeydown=(ev)=>{ if(ev.key==="Enter"){ ev.preventDefault(); inp.parentElement.querySelector("[data-add]")?.click(); } };
+  });
+  if(ADMIN_MODE){
+    tbody.querySelectorAll("[data-clear]").forEach(b=>{
+      b.onclick=async()=>{ try{ await clearSlot(b.getAttribute("data-clear")); toast("Créneau vidé","Toutes les réservations ont été supprimées.","warn"); }catch{ toast("Erreur serveur","Action impossible.","err"); } };
+    });
+    tbody.querySelectorAll("[data-remove]").forEach(ch=>{
+      ch.onclick=async()=>{ try{ await removeAt(ch.getAttribute("data-id"), +ch.getAttribute("data-remove")); toast("Supprimé","La réservation a été retirée.","warn"); }catch{ toast("Erreur serveur","Action impossible.","err"); } };
+    });
+  }
+}
+
+/* ===== ORCHESTRATION ===== */
+async function renderAll(fetchFirst=true){
+  try{
+    errBox?.classList.add("hidden"); if(errBox) errBox.textContent="";
+    const picked=parseISO(anchor.value) || new Date();
+    const tue=snapTuesday(picked);
+    anchor.value=fmtDate(tue);
+    const wed=addDays(tue,1);
+    rangeLabel.textContent=`Mardi ${tue.toLocaleDateString('fr-FR')} → Mercredi ${wed.toLocaleDateString('fr-FR')}`;
+    if(fetchFirst) await fetchWeekFromServer(tue);
+    renderWeek(tue);
+    renderDay(tue, +daySelect.value);
+  }catch(e){ console.error(e); if(errBox){ errBox.textContent="Erreur de chargement serveur."; errBox.classList.remove("hidden"); } }
+}
+
+/* ===== THEME / PALETTE ===== */
+const themeBtn=document.getElementById("toggleTheme"); const paletteSel=document.getElementById("palette");
+function applyTheme(theme){document.documentElement.classList.remove('light','dark');document.documentElement.classList.add(theme);localStorage.setItem("theme",theme);themeBtn.textContent=theme==="dark"?"☀️ Mode jour":"🌙 Mode nuit"}
+function applyPalette(name){document.documentElement.classList.remove('palette-teal','palette-sage','palette-sand','palette-slate');document.documentElement.classList.add(`palette-${name}`,document.documentElement.classList.contains('dark')?'dark':'light');localStorage.setItem('palette',name)}
+applyTheme(localStorage.getItem("theme")||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'));
+applyPalette(localStorage.getItem('palette')||'teal'); paletteSel.value=localStorage.getItem('palette')||'teal';
+themeBtn.onclick=()=>{applyTheme(document.documentElement.classList.contains('dark')?'light':'dark');applyPalette(paletteSel.value)}
+paletteSel.onchange=e=>applyPalette(e.target.value);
+
+/* ===== CONFIG LOADER ===== */
+function applyConfig(cfg){
+  CONFIG=cfg||CONFIG;
+  // services
+  if (Array.isArray(CONFIG.services)) SERVICES=CONFIG.services;
+  else {
+    const L=CONFIG.labels||{amma:"Massage AMMA Assis",rv:"Réalité Virtuelle",lumo:"Luminothérapie",doin:"Do In"};
+    const C=CONFIG.capacities||{amma:1,rv:1,lumo:2};
+    SERVICES=[{key:"amma",label:L.amma,capacity:C.amma??1,grey:false},{key:"rv",label:L.rv,capacity:C.rv??1,grey:false},{key:"lumo",label:L.lumo,capacity:C.lumo??2,grey:false},{key:"doin",label:L.doin,capacity:0,grey:true}];
+  }
+  DEFAULT_CAPACITY=Object.fromEntries(SERVICES.map(s=>[s.key,s.capacity||0]));
+  // fermetures
+  CLOSED_RANGES.splice(0,CLOSED_RANGES.length,...(CONFIG.closed||[]));
+  // plans mardi/mercredi
+  if (CONFIG.days?.Tuesday){ TUES.amma=CONFIG.days.Tuesday.amma||[]; TUES.rv=CONFIG.days.Tuesday.rv||[]; TUES.lumo=CONFIG.days.Tuesday.lumo||[]; TUES.doin=CONFIG.days.Tuesday.doin||[]; }
+  if (CONFIG.days?.Wednesday){ WED.amma=CONFIG.days.Wednesday.amma||[]; WED.rv=CONFIG.days.Wednesday.rv||[]; WED.lumo=CONFIG.days.Wednesday.lumo||[]; WED.doin=CONFIG.days.Wednesday.doin||[]; }
+  // ligne capacités
+  capacitiesLine.innerHTML = "Capacités : "+SERVICES.filter(s=>!s.grey).map(s=>`<b>${s.label}</b> ${s.capacity}`).join(" — ")+" — <b>Do In</b> non réservable.";
+}
+
+/* ===== ADMIN UI ===== */
+function updateAdminUI(){
+  if(ADMIN_MODE){ openCfgBtn.classList.remove("hidden"); resetBtn.classList.remove("hidden"); document.getElementById("toggleAdmin").textContent="Quitter Admin"; }
+  else { openCfgBtn.classList.add("hidden"); resetBtn.classList.add("hidden"); document.getElementById("toggleAdmin").textContent="Activer Admin"; }
+}
+document.getElementById("toggleAdmin").onclick=function(){
+  if(!ADMIN_MODE){ const pin=prompt("PIN Admin :"); if(pin===ADMIN_PIN){ ADMIN_MODE=true; localStorage.setItem("isAdmin","1"); toast("Admin activé","Vous pouvez modifier/supprimer.","ok"); } else if(pin!==null){ toast("PIN incorrect","Accès refusé.","err"); return; } }
+  else { ADMIN_MODE=false; localStorage.removeItem("isAdmin"); toast("Admin désactivé","Suppression verrouillée.","warn"); }
+  updateAdminUI(); renderAll(false);
+};
+openCfgBtn.onclick=()=>{ window.location.href="/config.html"; };
+resetBtn.onclick=async()=>{
+  if(!ADMIN_MODE){ alert("Mode Admin requis."); return; }
+  if(!confirm("Tout effacer ?")) return;
+  try{ const r=await fetch(`${API_BASE}/api/reset`,{method:"DELETE",headers:adminHeaders()}); if(!r.ok) throw 0; toast("Réinitialisé","Toutes les réservations ont été effacées.","warn"); }catch{ toast("Erreur serveur","Impossible de réinitialiser.","err"); }
+};
+
+/* ===== INIT ===== */
+(async function(){
+  connectRealtime();
+  const cfgResp=await fetch(`${API_BASE}/api/config`); if(cfgResp.ok){ applyConfig(await cfgResp.json()); }
+  const tue=snapTuesday(new Date()); anchor.value=fmtDate(tue); setActive("week"); updateAdminUI(); await renderAll(true);
+})();
+tabs.forEach(t=>t.onclick=()=>setActive(t.dataset.view));
+daySelect.onchange=()=>renderAll(false);
+document.getElementById("prevWeek").onclick=()=>{ const base=parseISO(anchor.value)||new Date(); anchor.value=fmtDate(addDays(snapTuesday(base),-7)); renderAll(true); };
+document.getElementById("nextWeek").onclick=()=>{ const base=parseISO(anchor.value)||new Date(); anchor.value=fmtDate(addDays(snapTuesday(base), 7)); renderAll(true); };
+anchor.addEventListener("change",()=>renderAll(true)); anchor.addEventListener("input",()=>renderAll(true));
+document.getElementById("exportCsv").onclick=()=>{
+  const rows=[["date","service","creneau","noms"]], label=k=>(SERVICES.find(s=>s.key===k)?.label||k);
+  for(const [id,v] of Object.entries(loadDB())){ const [d,s,t]=id.split("|"); rows.push([d,label(s),t,(v.names||[]).join(" / ")]); }
+  const csv=rows.map(r=>r.map(x=>`"${String(x).replace(/"/g,'""')}"`).join(";")).join("\n");
+  const a=document.createElement("a"); a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"})); a.download="reservations.csv"; a.click();
+};
+</script>
+</body>
+</html>
