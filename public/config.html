@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Configuration — Espace Bien-Être</title>
+
+  <style>
+    /* ===== Thème & palettes (mêmes noms/classes que la page principale) ===== */
+    :root {
+      --ok:#16a34a; --warn:#f59e0b; --radius:14px; --shadow:0 8px 24px rgba(16,24,40,.06);
+    }
+    :root.light { --bg:#f6f8f6; --panel:#fff; --muted:#f1f5f9; --border:#e5e7eb; --text:#0f172a; --text-muted:#64748b; }
+    :root.dark  { --bg:#0d1412; --panel:#111918; --muted:#0f1614; --border:#1f2a26; --text:#eaf1ee; --text-muted:#aec5bc; }
+
+/* Palettes complètes (identiques à l’index) */
+    :root.palette-teal.light { 
+      --accent:#0f766e; 
+      --bg:#f5f7fb; 
+      --panel:#ffffff; 
+      --muted:#e6f0f0; 
+      --border:#cfe3e2; 
+      --text:#0f172a; 
+      --text-muted:#48606a; 
+      --chip:#eef7f7;
+    }
+    :root.palette-teal.dark  { 
+      --accent:#14b8a6; 
+      --bg:#0b1220; 
+      --panel:#111827; 
+      --muted:#0f1b24; 
+      --border:#1f3940; 
+      --text:#e7eaf0; 
+      --text-muted:#a7c4c6; 
+      --chip:#0d1a1c; 
+    }
+
+    :root.palette-sage.light { 
+      --accent:#3f7f72; 
+      --bg:#f6f8f6; 
+      --panel:#ffffff; 
+      --muted:#ecf1ee; 
+      --border:#d6e0db; 
+      --text:#10211c; 
+      --text-muted:#566b62; 
+      --chip:#f1f5f2;
+    }
+    :root.palette-sage.dark  {
+      --accent:#69a99a;
+      --bg:#0d1412;
+      --panel:#111918;
+      --muted:#0f1614;
+      --border:#1f2a26;
+      --text:#eaf1ee;
+      --text-muted:#aec5bc;
+      --chip:#0f1614;
+    }
+
+    :root.palette-sand.light {
+      --accent:#8f6d3f;
+      --bg:#fbfaf7;
+      --panel:#ffffff;
+      --muted:#f3eee6;
+      --border:#e5dbc9;
+      --text:#201a12;
+      --text-muted:#6b5f51;
+      --chip:#f7f3ec;
+    }
+    :root.palette-sand.dark  {
+      --accent:#caa56f;
+      --bg:#15120e;
+      --panel:#1a1712;
+      --muted:#1a1611;
+      --border:#2a241b;
+      --text:#efeae3;
+      --text-muted:#d2c6b6;
+      --chip:#1a1611;
+    }
+
+    :root.palette-slate.light{
+      --accent:#405e8c;
+      --bg:#f5f7fb;
+      --panel:#ffffff;
+      --muted:#ecf0f7;
+      --border:#d6deea;
+      --text:#0e1726;
+      --text-muted:#53627a;
+      --chip:#f1f4fa;
+    }
+    :root.palette-slate.dark {
+      --accent:#60a5fa;
+      --bg:#0a101b;
+      --panel:#0f172a;
+      --muted:#0e1526;
+      --border:#1e2a44;
+      --text:#e6ecf8;
+      --text-muted:#b7c4df;
+      --chip:#0e1526;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--text);font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto}
+    .app{max-width:1000px;margin:24px auto;padding:0 16px}
+    h1{display:flex;gap:10px;align-items:center;margin:0 0 12px}
+    .topbar{display:flex;gap:8px;align-items:center;justify-content:flex-end;margin-bottom:8px}
+    select,button,input[type=number],textarea{
+      padding:10px 12px;border-radius:10px;border:1px solid var(--border);background:var(--panel);color:var(--text)
+    }
+    button{cursor:pointer}
+    .chip{padding:6px 10px;border-radius:999px;background:var(--muted);border:1px solid var(--border);color:var(--text-muted)}
+    .pill{padding:6px 12px;border-radius:999px;border:1px solid var(--border);background:var(--panel);color:var(--text-muted)}
+    .card{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px;margin:14px 0}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    label{font-weight:600;margin-bottom:6px;display:block}
+    textarea{width:100%;min-height:120px;resize:vertical;line-height:1.35}
+    .note{color:var(--text-muted);font-size:.9rem}
+    .btns{display:flex;gap:8px;justify-content:flex-end;margin-top:12px}
+    .primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+    .error{margin-top:6px;color:#dc2626;font-size:.92rem}
+    .ok{color:var(--ok)}
+  </style>
+</head>
+<body>
+<div class="app">
+
+  <div class="topbar">
+    <span class="chip">Apparence</span>
+    <select id="palette">
+      <option value="teal">Teal</option>
+      <option value="sage">Sauge</option>
+      <option value="sand">Sable</option>
+      <option value="slate">Ardoise</option>
+    </select>
+    <button id="toggleTheme" class="pill">🌙 Mode nuit</button>
+    <a href="/" class="pill" style="text-decoration:none">↩️ Retour</a>
+  </div>
+
+  <h1>⚙️ Configuration — Espace Bien-Être</h1>
+
+  <div class="card">
+    <div class="note">Page réservée aux administrateurs. Les modifications sont appliquées immédiatement sur les écrans ouverts.</div>
+  </div>
+
+  <div class="card">
+    <h2>Capacités</h2>
+    <div class="row">
+      <div>
+        <label>Massage AMMA Assis</label>
+        <input id="cap-amma" type="number" min="0" step="1">
+      </div>
+      <div>
+        <label>Réalité Virtuelle</label>
+        <input id="cap-rv" type="number" min="0" step="1">
+      </div>
+    </div>
+    <div class="row" style="margin-top:12px">
+      <div>
+        <label>Luminothérapie</label>
+        <input id="cap-lumo" type="number" min="0" step="1">
+      </div>
+      <div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Fermetures (périodes)</h2>
+    <div class="note">Une période par ligne, format <b>jj-mm-aaaa, jj-mm-aaaa</b> (du, au). Le format <code>jj/mm/aaaa</code> est aussi accepté.</div>
+    <textarea id="closed"></textarea>
+    <div id="closedError" class="error" style="display:none"></div>
+  </div>
+
+  <div class="card">
+    <h2>Planning — Mardi</h2>
+    <div class="grid">
+      <div>
+        <label>AMMA</label>
+        <textarea id="tue-amma" placeholder="11:30&#10;12:00&#10;12:30 ! (non réservable)&#10;14:00–15:00"></textarea>
+      </div>
+      <div>
+        <label>Réalité Virtuelle</label>
+        <textarea id="tue-rv"></textarea>
+      </div>
+      <div>
+        <label>Luminothérapie</label>
+        <textarea id="tue-lumo"></textarea>
+      </div>
+      <div>
+        <label>Do In (non réservable)</label>
+        <textarea id="tue-doin" placeholder="(généralement vide)"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Planning — Mercredi</h2>
+    <div class="grid">
+      <div>
+        <label>AMMA</label>
+        <textarea id="wed-amma"></textarea>
+      </div>
+      <div>
+        <label>Réalité Virtuelle</label>
+        <textarea id="wed-rv"></textarea>
+      </div>
+      <div>
+        <label>Luminothérapie</label>
+        <textarea id="wed-lumo"></textarea>
+      </div>
+      <div>
+        <label>Do In (non réservable)</label>
+        <textarea id="wed-doin"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <div class="btns">
+    <button id="cancel">Annuler</button>
+    <button id="save" class="primary">Enregistrer</button>
+  </div>
+
+  <div id="saveMsg" class="note" style="margin-top:10px"></div>
+</div>
+
+<script>
+/* ===== Apparence : synchro avec la page principale via localStorage ===== */
+const paletteSel = document.getElementById('palette');
+const themeBtn   = document.getElementById('toggleTheme');
+
+function setThemeButtonLabel(theme){
+  themeBtn.textContent = theme === 'dark' ? '☀️ Mode jour' : '🌙 Mode nuit';
+}
+
+function applyTheme(theme){
+  document.documentElement.classList.remove('light','dark');
+  document.documentElement.classList.add(theme);
+  localStorage.setItem('theme', theme);
+  setThemeButtonLabel(theme);
+}
+
+function applyPalette(name){
+  // retire l’ancienne palette
+  document.documentElement.classList.remove('palette-teal','palette-sage','palette-sand','palette-slate');
+  // applique seulement la classe palette ; la variante .light/.dark est déjà posée par applyTheme
+  document.documentElement.classList.add(`palette-${name}`);
+  localStorage.setItem('palette', name);
+}
+
+(function initAppearance(){
+  // thème/par défauts
+  const savedTheme = localStorage.getItem('theme') ||
+    (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  const savedPalette = localStorage.getItem('palette') || 'sage';
+
+  applyTheme(savedTheme);          // applique et met le bon libellé du bouton
+  applyPalette(savedPalette);
+  paletteSel.value = savedPalette;
+
+  // toggle
+  themeBtn.addEventListener('click', ()=>{
+    const next = document.documentElement.classList.contains('dark') ? 'light' : 'dark';
+    applyTheme(next);
+    applyPalette(paletteSel.value); // ré-applique la palette sur la variante jour/nuit
+  });
+
+  // changement de palette
+  paletteSel.addEventListener('change', e=> applyPalette(e.target.value));
+
+  // synchro en temps réel entre onglets/fenêtres
+  window.addEventListener('storage', (ev)=>{
+    if(ev.key === 'theme' && ev.newValue){
+      applyTheme(ev.newValue);
+    }
+    if(ev.key === 'palette' && ev.newValue){
+      paletteSel.value = ev.newValue;
+      applyPalette(ev.newValue);
+    }
+  });
+})();
+
+/* ====== Config API (identique fonctionnellement) ====== */
+const API_BASE = "";
+const ADMIN_SECRET = "INFO0035";
+
+/* FR <-> ISO */
+function isoToFr(iso){ const m=iso?.match(/^(\d{4})-(\d{2})-(\d{2})$/); return m?`${m[3]}-${m[2]}-${m[1]}`:iso; }
+function frToIso(fr){
+  const m = fr.trim().match(/^(\d{2})[\/\-](\d{2})[\/\-](\d{4})$/);
+  return m ? `${m[3]}-${m[2]}-${m[1]}` : null;
+}
+
+/* slots */
+function textToSlots(txt){
+  const lines=(txt||"").split(/\r?\n/).map(s=>s.trim()).filter(Boolean);
+  const out=[];
+  for(let s of lines){
+    let note=null;
+    const i=s.indexOf('#'); if(i>=0){ note=s.slice(i+1).trim(); s=s.slice(0,i).trim(); }
+    const non=/!$/.test(s); if(non) s=s.replace(/!+$/,'').trim();
+    if(!s) continue;
+    if(/^\d{1,2}:\d{2}(?:\s*–\s*\d{1,2}:\d{2})?$/.test(s)){
+      const obj=s.includes('–')?{t:s}:s;
+      if(typeof obj==='object'){ if(non) obj.non=true; if(note) obj.note=note; out.push(obj); }
+      else out.push(non?{t:obj,non:true,note:note||undefined}:obj);
+    }
+  }
+  return out;
+}
+function slotsToText(arr){
+  return (arr||[]).map(x=>{
+    if(typeof x==='string') return x;
+    let s=x.t||''; if(x.non) s+=' !'; if(x.note) s+=' # '+x.note; return s;
+  }).join('\n');
+}
+
+/* load config */
+let CFG=null;
+async function loadConfig(){
+  const r=await fetch(`${API_BASE}/api/config`);
+  if(!r.ok) throw new Error('load config failed');
+  CFG=await r.json();
+
+  document.getElementById('cap-amma').value = CFG.capacities?.amma ?? 1;
+  document.getElementById('cap-rv').value   = CFG.capacities?.rv   ?? 1;
+  document.getElementById('cap-lumo').value = CFG.capacities?.lumo ?? 2;
+
+  document.getElementById('closed').value = (CFG.closed||[])
+    .map(([a,b])=>`${isoToFr(a)}, ${isoToFr(b)}`).join('\n');
+
+  const T = CFG.days?.Tuesday||{amma:[],rv:[],lumo:[],doin:[]};
+  const W = CFG.days?.Wednesday||{amma:[],rv:[],lumo:[],doin:[]};
+  document.getElementById('tue-amma').value = slotsToText(T.amma);
+  document.getElementById('tue-rv').value   = slotsToText(T.rv);
+  document.getElementById('tue-lumo').value = slotsToText(T.lumo);
+  document.getElementById('tue-doin').value = slotsToText(T.doin);
+  document.getElementById('wed-amma').value = slotsToText(W.amma);
+  document.getElementById('wed-rv').value   = slotsToText(W.rv);
+  document.getElementById('wed-lumo').value = slotsToText(W.lumo);
+  document.getElementById('wed-doin').value = slotsToText(W.doin);
+}
+
+/* closed validation */
+function readClosedFromTextarea(){
+  const elErr=document.getElementById('closedError'); elErr.style.display='none'; elErr.textContent='';
+  const lines=document.getElementById('closed').value.split(/\r?\n/);
+  const out=[]; const bad=[];
+  lines.forEach((raw,i)=>{
+    const s=raw.trim(); if(!s) return;
+    const m=s.match(/^(\d{2}[\/\-]\d{2}[\/\-]\d{4})\s*,\s*(\d{2}[\/\-]\d{2}[\/\-]\d{4})$/);
+    if(!m){ bad.push(i+1); return; }
+    const a=frToIso(m[1]); const b=frToIso(m[2]); if(!a||!b){ bad.push(i+1); return; }
+    out.push([a,b]);
+  });
+  if(bad.length){
+    elErr.textContent = `Format invalide ligne${bad.length>1?'s':''} : ${bad.join(', ')}. Utilisez "jj-mm-aaaa, jj-mm-aaaa".`;
+    elErr.style.display='block';
+    throw new Error('invalid closed lines');
+  }
+  return out;
+}
+
+/* save */
+async function save(){
+  const body={
+    capacities:{
+      amma:+document.getElementById('cap-amma').value||0,
+      rv:+document.getElementById('cap-rv').value||0,
+      lumo:+document.getElementById('cap-lumo').value||0,
+    },
+    closed: readClosedFromTextarea(),
+    days:{
+      Tuesday:{
+        amma:textToSlots(document.getElementById('tue-amma').value),
+        rv:textToSlots(document.getElementById('tue-rv').value),
+        lumo:textToSlots(document.getElementById('tue-lumo').value),
+        doin:textToSlots(document.getElementById('tue-doin').value),
+      },
+      Wednesday:{
+        amma:textToSlots(document.getElementById('wed-amma').value),
+        rv:textToSlots(document.getElementById('wed-rv').value),
+        lumo:textToSlots(document.getElementById('wed-lumo').value),
+        doin:textToSlots(document.getElementById('wed-doin').value),
+      }
+    }
+  };
+
+  const r=await fetch(`${API_BASE}/api/config`,{
+    method:'PUT',
+    headers:{'Content-Type':'application/json','X-Admin-Secret':ADMIN_SECRET},
+    body:JSON.stringify(body)
+  });
+  const msg=document.getElementById('saveMsg');
+  if(!r.ok){ msg.innerHTML=`<span class="error">Erreur ${r.status}</span>`; return; }
+  msg.innerHTML=`<span class="ok">✅ Enregistré. Les écrans vont se mettre à jour.</span>`;
+}
+
+/* init */
+document.getElementById('cancel').onclick=()=>history.back();
+document.getElementById('save').onclick=()=>{ save().catch(()=>{}); };
+loadConfig().catch(e=>alert('Impossible de charger la configuration: '+(e?.message||e)));
+</script>
+</body>
+</html>
+
+
