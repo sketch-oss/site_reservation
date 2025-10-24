@@ -1,404 +1,771 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" class="light">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Configuration — Espace Bien-Être</title>
-
-  <style>
-    /* ===== Thème & palettes (mêmes noms/classes que la page principale) ===== */
-    :root {
-      --ok:#16a34a; --warn:#f59e0b; --radius:14px; --shadow:0 8px 24px rgba(16,24,40,.06);
-    }
-    :root.light { --bg:#f6f8f6; --panel:#fff; --muted:#f1f5f9; --border:#e5e7eb; --text:#0f172a; --text-muted:#64748b; }
-    :root.dark  { --bg:#0d1412; --panel:#111918; --muted:#0f1614; --border:#1f2a26; --text:#eaf1ee; --text-muted:#aec5bc; }
-
-/* Palettes complètes (identiques à l’index) */
-    :root.palette-teal.light { 
-      --accent:#0f766e; 
-      --bg:#f5f7fb; 
-      --panel:#ffffff; 
-      --muted:#e6f0f0; 
-      --border:#cfe3e2; 
-      --text:#0f172a; 
-      --text-muted:#48606a; 
-      --chip:#eef7f7;
-    }
-    :root.palette-teal.dark  { 
-      --accent:#14b8a6; 
-      --bg:#0b1220; 
-      --panel:#111827; 
-      --muted:#0f1b24; 
-      --border:#1f3940; 
-      --text:#e7eaf0; 
-      --text-muted:#a7c4c6; 
-      --chip:#0d1a1c; 
-    }
-
-    :root.palette-sage.light { 
-      --accent:#3f7f72; 
-      --bg:#f6f8f6; 
-      --panel:#ffffff; 
-      --muted:#ecf1ee; 
-      --border:#d6e0db; 
-      --text:#10211c; 
-      --text-muted:#566b62; 
-      --chip:#f1f5f2;
-    }
-    :root.palette-sage.dark  {
-      --accent:#69a99a;
-      --bg:#0d1412;
-      --panel:#111918;
-      --muted:#0f1614;
-      --border:#1f2a26;
-      --text:#eaf1ee;
-      --text-muted:#aec5bc;
-      --chip:#0f1614;
-    }
-
-    :root.palette-sand.light {
-      --accent:#8f6d3f;
-      --bg:#fbfaf7;
-      --panel:#ffffff;
-      --muted:#f3eee6;
-      --border:#e5dbc9;
-      --text:#201a12;
-      --text-muted:#6b5f51;
-      --chip:#f7f3ec;
-    }
-    :root.palette-sand.dark  {
-      --accent:#caa56f;
-      --bg:#15120e;
-      --panel:#1a1712;
-      --muted:#1a1611;
-      --border:#2a241b;
-      --text:#efeae3;
-      --text-muted:#d2c6b6;
-      --chip:#1a1611;
-    }
-
-    :root.palette-slate.light{
-      --accent:#405e8c;
-      --bg:#f5f7fb;
-      --panel:#ffffff;
-      --muted:#ecf0f7;
-      --border:#d6deea;
-      --text:#0e1726;
-      --text-muted:#53627a;
-      --chip:#f1f4fa;
-    }
-    :root.palette-slate.dark {
-      --accent:#60a5fa;
-      --bg:#0a101b;
-      --panel:#0f172a;
-      --muted:#0e1526;
-      --border:#1e2a44;
-      --text:#e6ecf8;
-      --text-muted:#b7c4df;
-      --chip:#0e1526;
-    }
-    *{box-sizing:border-box}
-    body{margin:0;background:var(--bg);color:var(--text);font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto}
-    .app{max-width:1000px;margin:24px auto;padding:0 16px}
-    h1{display:flex;gap:10px;align-items:center;margin:0 0 12px}
-    .topbar{display:flex;gap:8px;align-items:center;justify-content:flex-end;margin-bottom:8px}
-    select,button,input[type=number],textarea{
-      padding:10px 12px;border-radius:10px;border:1px solid var(--border);background:var(--panel);color:var(--text)
-    }
-    button{cursor:pointer}
-    .chip{padding:6px 10px;border-radius:999px;background:var(--muted);border:1px solid var(--border);color:var(--text-muted)}
-    .pill{padding:6px 12px;border-radius:999px;border:1px solid var(--border);background:var(--panel);color:var(--text-muted)}
-    .card{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px;margin:14px 0}
-    .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-    .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-    label{font-weight:600;margin-bottom:6px;display:block}
-    textarea{width:100%;min-height:120px;resize:vertical;line-height:1.35}
-    .note{color:var(--text-muted);font-size:.9rem}
-    .btns{display:flex;gap:8px;justify-content:flex-end;margin-top:12px}
-    .primary{background:var(--accent);color:#fff;border-color:var(--accent)}
-    .error{margin-top:6px;color:#dc2626;font-size:.92rem}
-    .ok{color:var(--ok)}
-  </style>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Configuration - salle de visite LAP</title>
+<link rel="stylesheet" href="/assets/app.css">
 </head>
 <body>
-<div class="app">
-
-  <div class="topbar">
-    <span class="chip">Apparence</span>
-    <select id="palette">
-      <option value="teal">Teal</option>
-      <option value="sage">Sauge</option>
-      <option value="sand">Sable</option>
-      <option value="slate">Ardoise</option>
-    </select>
-    <button id="toggleTheme" class="pill">🌙 Mode nuit</button>
-    <a href="/" class="pill" style="text-decoration:none">↩️ Retour</a>
+  <div class="app" id="configPage">
+  <header class="brand-header">
+  <div class="brand-logos">
+    <img src="/assets/logo-lap.png" alt="Lien Animaux Patients" class="logo lap">
+    <img src="/assets/logo-cpn.png" alt="Centre Psychothérapique de Nancy" class="logo cpn">
   </div>
-
-  <h1>⚙️ Configuration — Espace Bien-Être</h1>
-
-  <div class="card">
-    <div class="note">Page réservée aux administrateurs. Les modifications sont appliquées immédiatement sur les écrans ouverts.</div>
-  </div>
-
-  <div class="card">
-    <h2>Capacités</h2>
-    <div class="row">
-      <div>
-        <label>Massage AMMA Assis</label>
-        <input id="cap-amma" type="number" min="0" step="1">
-      </div>
-      <div>
-        <label>Réalité Virtuelle</label>
-        <input id="cap-rv" type="number" min="0" step="1">
-      </div>
+    <h1>⚙️ <span class="accent">Configuration</span> - salle de visite LAP</h1>
+    <div>
+      <select id="paletteSel"><option value="teal">Teal</option><option value="sage">Sauge</option><option value="sand">Sable</option><option value="slate">Ardoise</option></select>
+      <button id="backBtn">↩️ Retour</button>
     </div>
-    <div class="row" style="margin-top:12px">
-      <div>
-        <label>Luminothérapie</label>
-        <input id="cap-lumo" type="number" min="0" step="1">
-      </div>
-      <div></div>
-    </div>
-  </div>
+  </header>
 
-  <div class="card">
+  <p class="note">Les changements sont appliqués après avoir enregistré.</p>
+
+  <section id="servicesSec">
+    <h2>Services</h2>
+    <p class="note">Ajouter/supprimer des services.</p>
+    <div class="services-grid svc-head">
+  <div class="svc-label">Service</div>
+  <div class="svc-field">Capacité</div>
+  <div class="svc-field">Durée (min)</div>
+  <div class="svc-field">État</div>
+  <div class="svc-trash"></div>
+    </div>
+    <div id="servicesList" class="service-grid"></div>
+    <div class="svc-add">
+  <input id="newLabel" placeholder="Libellé (ex: Sophrologie)"/>
+  <input id="newCap" type="number" min="0" value="1" title="Capacité"/>
+  <select id="newGrey">
+    <option value="false">Réservable</option>
+    <option value="true">Colonne grisée</option>
+  </select>
+  <button id="addService">➕</button>
+</div>
+  </section>
+
+  <section class="card" id="openDaysSec">
+  <h2>Jours ouverts</h2>
+  <p class="note">Décoche un jour pour le masquer des plannings (jour fermé).</p>
+  <div id="openDaysChips" class="chips"></div>
+</section>
+
+  <section>
     <h2>Fermetures (périodes)</h2>
-    <div class="note">Une période par ligne, format <b>jj-mm-aaaa, jj-mm-aaaa</b> (du, au). Le format <code>jj/mm/aaaa</code> est aussi accepté.</div>
-    <textarea id="closed"></textarea>
-    <div id="closedError" class="error" style="display:none"></div>
-  </div>
+    <p class="note">Format <b>jj/mm/aaaa-jj/mm/aaaa</b> (du–au), une ligne par période. <i>Ex.</i> 25/12/2025-03/01/2026</p>
+    <textarea id="closed" rows="5" placeholder="25/12/2025-03/01/2026"></textarea>
+  </section>
 
-  <div class="card">
-    <h2>Planning — Mardi</h2>
-    <div class="grid">
-      <div>
-        <label>AMMA</label>
-        <textarea id="tue-amma" placeholder="11:30&#10;12:00&#10;12:30 ! (non réservable)&#10;14:00–15:00"></textarea>
-      </div>
-      <div>
-        <label>Réalité Virtuelle</label>
-        <textarea id="tue-rv"></textarea>
-      </div>
-      <div>
-        <label>Luminothérapie</label>
-        <textarea id="tue-lumo"></textarea>
-      </div>
-      <div>
-        <label>Do In (non réservable)</label>
-        <textarea id="tue-doin" placeholder="(généralement vide)"></textarea>
-      </div>
+  <section>
+    <h2>Blocages ponctuels</h2>
+    <p class="note">Permet d’empêcher une réservation sur un créneau précis (date + service + heure).</p>
+    <div id="blocksList"></div>
+    <div style="margin-top:10px">
+      <input type="date" id="blockDate">
+      <select id="blockService"></select>
+      <input type="time" id="blockSlot">
+      <button id="addBlock">➕</button>
     </div>
+  </section>
+
+  <section>
+  <h2>Plannings (Lundi → Dimanche)</h2>
+  <p class="note">Ajouter des créneaux avec les menus déroulants. Possibilité d'ajouter « tous les X min entre A et B ».</p>
+  <div class="planner-toolbar">
+  <div class="control">
+    <span class="lbl">Plage rapide</span>
+    <select id="quickStart"></select>
+    <span class="arrow">→</span>
+    <select id="quickEnd"></select>
   </div>
 
-  <div class="card">
-    <h2>Planning — Mercredi</h2>
-    <div class="grid">
-      <div>
-        <label>AMMA</label>
-        <textarea id="wed-amma"></textarea>
-      </div>
-      <div>
-        <label>Réalité Virtuelle</label>
-        <textarea id="wed-rv"></textarea>
-      </div>
-      <div>
-        <label>Luminothérapie</label>
-        <textarea id="wed-lumo"></textarea>
-      </div>
-      <div>
-        <label>Do In (non réservable)</label>
-        <textarea id="wed-doin"></textarea>
-      </div>
-    </div>
+  <div class="control">
+    <span>chaque</span>
+    <select id="quickStep">
+      <option>15</option><option selected>30</option><option>45</option><option>60</option><option>120</option>
+    </select>
+    <span>min</span>
   </div>
 
-  <div class="btns">
-    <button id="cancel">Annuler</button>
-    <button id="save" class="primary">Enregistrer</button>
+  <div class="control">
+    <span class="lbl">Jour</span>
+    <select id="qaDay"></select>
   </div>
 
-  <div id="saveMsg" class="note" style="margin-top:10px"></div>
+  <div class="control">
+    <select id="quickService" title="Service">
+      <option value="*">Tous les services réservables</option>
+    </select>
+  </div>
+
+  <button id="quickApply" class="btn-ghost btn-plus">➕ Ajouter</button>
+
+  <span class="hint sub">Astuce : cliquer une carte jour pour la sélectionner.</span>
+</div>
+  <div id="daysWrap" class="card-grid"></div>
+</section>
+
+
+  <section id="mailSec" class="hidden">
+  <h2>Emails - Réglages & modèles</h2>
+  <p class="note">
+    Variables disponibles : <code>{{service}}</code>, <code>{{date}}</code>, <code>{{slot}}</code>, <code>{{email}}</code>
+  </p>
+
+  <div class="row" style="grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px">
+    <label>Adresse d'envoi (From)<br>
+      <input id="mail_from" type="email" placeholder="resa@cpn-laxou.com">
+    </label>
+    <label>Destinataire “service bien-être”<br>
+      <input id="mail_responsible" type="email" placeholder="Mathieu.Dreyer@cpn-laxou.com">
+    </label>
+  </div>
+
+  <h3 style="margin-top:12px">Modèles - Réservation</h3>
+  <div class="row" style="grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px">
+    <label>Sujet (client)<br>
+      <input id="mail_subject_user" type="text">
+    </label>
+    <label>Sujet (service)<br>
+      <input id="mail_subject_service" type="text">
+    </label>
+  </div>
+  <div class="row" style="grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px">
+    <label>Corps (client)<br>
+      <textarea id="mail_body_user" rows="7" style="font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace"></textarea>
+    </label>
+    <label>Corps (service)<br>
+      <textarea id="mail_body_service" rows="7" style="font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace"></textarea>
+    </label>
+  </div>
+
+  <h3 style="margin-top:12px">Modèles - Annulation</h3>
+  <div class="row" style="grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px">
+    <label>Sujet (client)<br>
+      <input id="mail_cancel_subject_user" type="text">
+    </label>
+    <label>Sujet (service)<br>
+      <input id="mail_cancel_subject_service" type="text">
+    </label>
+  </div>
+  <div class="row" style="grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px">
+    <label>Corps (client)<br>
+      <textarea id="mail_cancel_body_user" rows="6" style="font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace"></textarea>
+    </label>
+    <label>Corps (service)<br>
+      <textarea id="mail_cancel_body_service" rows="6" style="font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace"></textarea>
+    </label>
+  </div>
+</section>
+
+  <button id="saveBtn" class="save">💾 Enregistrer</button>
 </div>
 
 <script>
-/* ===== Apparence : synchro avec la page principale via localStorage ===== */
-const paletteSel = document.getElementById('palette');
-const themeBtn   = document.getElementById('toggleTheme');
+/* ===== Thème/palette sync (mêmes clefs que index) ===== */
+function applyPalette(p){document.documentElement.classList.remove('palette-teal','palette-sage','palette-sand','palette-slate');document.documentElement.classList.add(`palette-${p}`,document.documentElement.classList.contains('dark')?'dark':'light');localStorage.setItem('palette',p)}
+const toggleTheme=document.getElementById('toggleTheme'), paletteSel=document.getElementById('paletteSel');
+applyPalette(localStorage.getItem('palette')||'teal'); paletteSel.value=localStorage.getItem('palette')||'teal';
+paletteSel.onchange=e=>applyPalette(e.target.value);
+document.getElementById('backBtn').onclick=()=>history.back();
 
-function setThemeButtonLabel(theme){
-  themeBtn.textContent = theme === 'dark' ? '☀️ Mode jour' : '🌙 Mode nuit';
-}
+/* ===== API ===== */
+const API_BASE=""; const ADMIN_SECRET="INFO0035";
 
-function applyTheme(theme){
-  document.documentElement.classList.remove('light','dark');
-  document.documentElement.classList.add(theme);
-  localStorage.setItem('theme', theme);
-  setThemeButtonLabel(theme);
-}
+/* ===== jours ===== */
+const DAYS=[
+  {key:"Monday",label:"Lundi"},{key:"Tuesday",label:"Mardi"},{key:"Wednesday",label:"Mercredi"},
+  {key:"Thursday",label:"Jeudi"},{key:"Friday",label:"Vendredi"},{key:"Saturday",label:"Samedi"},{key:"Sunday",label:"Dimanche"},
+];
+const ALL_DAYS  = DAYS.map(d => d.key);
+const DAY_LABEL = Object.fromEntries(DAYS.map(d => [d.key, d.label]));
+let OPEN_DAYS   = [...ALL_DAYS];
 
-function applyPalette(name){
-  // retire l’ancienne palette
-  document.documentElement.classList.remove('palette-teal','palette-sage','palette-sand','palette-slate');
-  // applique seulement la classe palette ; la variante .light/.dark est déjà posée par applyTheme
-  document.documentElement.classList.add(`palette-${name}`);
-  localStorage.setItem('palette', name);
-}
-
-(function initAppearance(){
-  // thème/par défauts
-  const savedTheme = localStorage.getItem('theme') ||
-    (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-  const savedPalette = localStorage.getItem('palette') || 'sage';
-
-  applyTheme(savedTheme);          // applique et met le bon libellé du bouton
-  applyPalette(savedPalette);
-  paletteSel.value = savedPalette;
-
-  // toggle
-  themeBtn.addEventListener('click', ()=>{
-    const next = document.documentElement.classList.contains('dark') ? 'light' : 'dark';
-    applyTheme(next);
-    applyPalette(paletteSel.value); // ré-applique la palette sur la variante jour/nuit
+/* ===== parsing helpers ===== */
+// --- helper: un créneau est-il bloqué ? ---
+// dayIso = "YYYY-MM-DD", serviceKey = "amma" | "rv" | "lumo" | "doin" | "*", timeStr = "HH:MM" ou "HH:MM–HH:MM"
+function isBlocked(dayIso, serviceKey, timeStr){
+  const blocks = (CONFIG && Array.isArray(CONFIG.blocks)) ? CONFIG.blocks : [];
+  return blocks.some(b => {
+    if (b.date !== dayIso) return false;
+    if (!(b.service === "*" || b.service === serviceKey)) return false;
+    // match exact "HH:MM" ou plage "HH:MM–HH:MM"
+    if (b.slot === timeStr) return true;
+    // si le bloc est "14:00" et le créneau est "14:00–15:00", on le considère bloqué aussi
+    if (/^\d{1,2}:\d{2}$/.test(b.slot) && /^\d{1,2}:\d{2}–\d{1,2}:\d{2}$/.test(timeStr)) {
+      return timeStr.startsWith(b.slot);
+    }
+    return false;
   });
-
-  // changement de palette
-  paletteSel.addEventListener('change', e=> applyPalette(e.target.value));
-
-  // synchro en temps réel entre onglets/fenêtres
-  window.addEventListener('storage', (ev)=>{
-    if(ev.key === 'theme' && ev.newValue){
-      applyTheme(ev.newValue);
-    }
-    if(ev.key === 'palette' && ev.newValue){
-      paletteSel.value = ev.newValue;
-      applyPalette(ev.newValue);
-    }
-  });
-})();
-
-/* ====== Config API (identique fonctionnellement) ====== */
-const API_BASE = "";
-const ADMIN_SECRET = "INFO0035";
-
-/* FR <-> ISO */
-function isoToFr(iso){ const m=iso?.match(/^(\d{4})-(\d{2})-(\d{2})$/); return m?`${m[3]}-${m[2]}-${m[1]}`:iso; }
-function frToIso(fr){
-  const m = fr.trim().match(/^(\d{2})[\/\-](\d{2})[\/\-](\d{4})$/);
-  return m ? `${m[3]}-${m[2]}-${m[1]}` : null;
 }
 
-/* slots */
-function textToSlots(txt){
-  const lines=(txt||"").split(/\r?\n/).map(s=>s.trim()).filter(Boolean);
-  const out=[];
-  for(let s of lines){
-    let note=null;
-    const i=s.indexOf('#'); if(i>=0){ note=s.slice(i+1).trim(); s=s.slice(0,i).trim(); }
-    const non=/!$/.test(s); if(non) s=s.replace(/!+$/,'').trim();
-    if(!s) continue;
-    if(/^\d{1,2}:\d{2}(?:\s*–\s*\d{1,2}:\d{2})?$/.test(s)){
-      const obj=s.includes('–')?{t:s}:s;
-      if(typeof obj==='object'){ if(non) obj.non=true; if(note) obj.note=note; out.push(obj); }
-      else out.push(non?{t:obj,non:true,note:note||undefined}:obj);
-    }
+function parseClosedRangesText(text){
+  // Convertit "jj/mm/aaaa-jj/mm/aaaa" -> [["YYYY-MM-DD","YYYY-MM-DD"], ...]
+  var lines = String(text || "")
+    .split(/\r?\n/)
+    .map(function(s){ return s.trim(); })
+    .filter(Boolean);
+
+  //  function declaration = hoistée (pas d’erreur “lexical”)
+  function frToISO(dmy){
+    // attend exactement "jj/mm/aaaa"
+    var m = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(dmy);
+    if(!m) throw new Error("Format attendu jj/mm/aaaa");
+    var jj = m[1], mm = m[2], aaaa = m[3];
+    return aaaa + "-" + mm + "-" + jj; // "YYYY-MM-DD"
   }
-  return out;
-}
-function slotsToText(arr){
-  return (arr||[]).map(x=>{
-    if(typeof x==='string') return x;
-    let s=x.t||''; if(x.non) s+=' !'; if(x.note) s+=' # '+x.note; return s;
-  }).join('\n');
-}
 
-/* load config */
-let CFG=null;
-async function loadConfig(){
-  const r=await fetch(`${API_BASE}/api/config`);
-  if(!r.ok) throw new Error('load config failed');
-  CFG=await r.json();
-
-  document.getElementById('cap-amma').value = CFG.capacities?.amma ?? 1;
-  document.getElementById('cap-rv').value   = CFG.capacities?.rv   ?? 1;
-  document.getElementById('cap-lumo').value = CFG.capacities?.lumo ?? 2;
-
-  document.getElementById('closed').value = (CFG.closed||[])
-    .map(([a,b])=>`${isoToFr(a)}, ${isoToFr(b)}`).join('\n');
-
-  const T = CFG.days?.Tuesday||{amma:[],rv:[],lumo:[],doin:[]};
-  const W = CFG.days?.Wednesday||{amma:[],rv:[],lumo:[],doin:[]};
-  document.getElementById('tue-amma').value = slotsToText(T.amma);
-  document.getElementById('tue-rv').value   = slotsToText(T.rv);
-  document.getElementById('tue-lumo').value = slotsToText(T.lumo);
-  document.getElementById('tue-doin').value = slotsToText(T.doin);
-  document.getElementById('wed-amma').value = slotsToText(W.amma);
-  document.getElementById('wed-rv').value   = slotsToText(W.rv);
-  document.getElementById('wed-lumo').value = slotsToText(W.lumo);
-  document.getElementById('wed-doin').value = slotsToText(W.doin);
-}
-
-/* closed validation */
-function readClosedFromTextarea(){
-  const elErr=document.getElementById('closedError'); elErr.style.display='none'; elErr.textContent='';
-  const lines=document.getElementById('closed').value.split(/\r?\n/);
-  const out=[]; const bad=[];
-  lines.forEach((raw,i)=>{
-    const s=raw.trim(); if(!s) return;
-    const m=s.match(/^(\d{2}[\/\-]\d{2}[\/\-]\d{4})\s*,\s*(\d{2}[\/\-]\d{2}[\/\-]\d{4})$/);
-    if(!m){ bad.push(i+1); return; }
-    const a=frToIso(m[1]); const b=frToIso(m[2]); if(!a||!b){ bad.push(i+1); return; }
-    out.push([a,b]);
-  });
-  if(bad.length){
-    elErr.textContent = `Format invalide ligne${bad.length>1?'s':''} : ${bad.join(', ')}. Utilisez "jj-mm-aaaa, jj-mm-aaaa".`;
-    elErr.style.display='block';
-    throw new Error('invalid closed lines');
-  }
-  return out;
-}
-
-/* save */
-async function save(){
-  const body={
-    capacities:{
-      amma:+document.getElementById('cap-amma').value||0,
-      rv:+document.getElementById('cap-rv').value||0,
-      lumo:+document.getElementById('cap-lumo').value||0,
-    },
-    closed: readClosedFromTextarea(),
-    days:{
-      Tuesday:{
-        amma:textToSlots(document.getElementById('tue-amma').value),
-        rv:textToSlots(document.getElementById('tue-rv').value),
-        lumo:textToSlots(document.getElementById('tue-lumo').value),
-        doin:textToSlots(document.getElementById('tue-doin').value),
-      },
-      Wednesday:{
-        amma:textToSlots(document.getElementById('wed-amma').value),
-        rv:textToSlots(document.getElementById('wed-rv').value),
-        lumo:textToSlots(document.getElementById('wed-lumo').value),
-        doin:textToSlots(document.getElementById('wed-doin').value),
-      }
+  var ranges = [];
+  for (var i=0; i<lines.length; i++){
+    var line = lines[i];
+    var parts = line.split("-");
+    if (parts.length !== 2) {
+      throw new Error('Ligne invalide: "' + line + '" (attendu jj/mm/aaaa-jj/mm/aaaa)');
     }
+    var fromISO = frToISO(parts[0].trim());
+    var toISO   = frToISO(parts[1].trim());
+    ranges.push([fromISO, toISO]);
+  }
+  return ranges;
+}
+
+
+function closedRangesToText(closed){
+  const toFR = iso => {
+    const [y,m,d] = iso.split("-");
+    return `${d}/${m}/${y}`;
   };
-
-  const r=await fetch(`${API_BASE}/api/config`,{
-    method:'PUT',
-    headers:{'Content-Type':'application/json','X-Admin-Secret':ADMIN_SECRET},
-    body:JSON.stringify(body)
-  });
-  const msg=document.getElementById('saveMsg');
-  if(!r.ok){ msg.innerHTML=`<span class="error">Erreur ${r.status}</span>`; return; }
-  msg.innerHTML=`<span class="ok">✅ Enregistré. Les écrans vont se mettre à jour.</span>`;
+  return (closed||[])
+    .map(([a,b]) => `${toFR(a)}-${toFR(b)}`)
+    .join("\n");
 }
 
-/* init */
-document.getElementById('cancel').onclick=()=>history.back();
-document.getElementById('save').onclick=()=>{ save().catch(()=>{}); };
-loadConfig().catch(e=>alert('Impossible de charger la configuration: '+(e?.message||e)));
+function saveUI() {                 // ✅ lit l’écran -> met à jour la copie locale
+  try { UI_DAYS = readDaysFromUI(); }
+  catch { /* rien, on garde UI_DAYS tel quel */ }
+}
+function rerender() {               // ✅ re-render à partir de la copie locale
+  renderDaysGrid(UI_DAYS);
+}
+
+
+function parseTimeLines(txt){
+  const out=[]; for(let raw of String(txt||"").split(/\r?\n/)){let l=raw.trim(); if(!l||l.startsWith("#")) continue;
+    let note=""; const i=l.indexOf("#"); if(i>=0){note=l.slice(i+1).trim(); l=l.slice(0,i).trim()}
+    const non=/^!\s*/.test(l)||/\s*!$/.test(l); l=l.replace(/^!\s*/,"").replace(/\s*!$/,"");
+    const r=l.match(/^(\d{1,2}:\d{2})\s*[–-]\s*(\d{1,2}:\d{2})$/); if(r){out.push({t:`${r[1]}–${r[2]}`,non,note}); continue}
+    const s=l.match(/^(\d{1,2}:\d{2})$/); if(s){out.push(non?{t:s[1],non,note}:s[1]);}
+  } return out;
+}
+
+/* ===== Services UI ===== */
+const servicesList=document.getElementById('servicesList');
+let CONFIG=null, SERVICES=[];
+let UI_DAYS = {};         // ✅ copie locale, seule source pour l’UI
+
+function slugify(label){
+  return label.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"").slice(0,24);
+}
+function renderServices(){
+  servicesList.innerHTML="";
+  SERVICES.forEach((s,idx)=>{
+    const row=document.createElement('div'); row.className="service";
+row.innerHTML = `
+  <div class="svc-label">
+    <b>${s.label}</b>
+    <small class="note">${s.key}</small>
+  </div>
+
+  <div class="svc-field">
+    <input type="number" min="0" value="${s.capacity}" data-cap="${idx}" aria-label="Capacité">
+  </div>
+
+  <div class="svc-field">
+    <input type="number" min="5" value="${s.durationMin||30}" data-dur="${idx}" aria-label="Durée (min)">
+  </div>
+
+  <div class="svc-field">
+    <select data-grey="${idx}" aria-label="État">
+      <option value="false"${!s.grey?" selected":""}>Réservable</option>
+      <option value="true"${s.grey?" selected":""}>Colonne grisée</option>
+    </select>
+  </div>
+
+  <div class="svc-trash">
+    <button data-del="${idx}" title="Supprimer">🗑️</button>
+  </div>
+`;
+
+    servicesList.appendChild(row);
+  });
+  servicesList.querySelectorAll("[data-cap]").forEach(el=>{
+    el.oninput=()=>{ const i=+el.getAttribute("data-cap"); SERVICES[i].capacity=Math.max(0,+el.value||0); };
+  });
+  servicesList.querySelectorAll("[data-dur]").forEach(el=>{
+  el.oninput=()=>{ const i=+el.getAttribute("data-dur"); SERVICES[i].durationMin=Math.max(5,+el.value||30); };
+});
+
+  servicesList.querySelectorAll("[data-grey]").forEach(el=>{
+    el.onchange=()=>{ const i=+el.getAttribute("data-grey"); SERVICES[i].grey=el.value==="true"; };
+  });
+  servicesList.querySelectorAll("[data-del]").forEach(btn=>{
+    btn.onclick=()=>{ const i=+btn.getAttribute("data-del");
+      SERVICES.splice(i,1); 
+renderServices();
+rerender();   // ✅
+
+    };
+  });
+}
+document.getElementById("addService").onclick=()=>{
+  const label=(document.getElementById("newLabel").value||"").trim();
+  const cap=Math.max(0,+document.getElementById("newCap").value||0);
+  const grey=document.getElementById("newGrey").value==="true";
+  if(!label){ alert("Libellé requis."); return; }
+  let key=slugify(label)||`srv-${Date.now().toString(36)}`;
+  if (SERVICES.some(s=>s.key===key)) key = `${key}-${(Math.random()*100|0)}`;
+  SERVICES.push({key,label,capacity:cap,grey});
+  document.getElementById("newLabel").value=""; document.getElementById("newCap").value=1; document.getElementById("newGrey").value="false";
+  renderServices();
+  rerender();   // ✅ affiche depuis UI_DAYS
+
+};
+
+/* ===== Days grid ===== */
+const daysWrap = document.getElementById("daysWrap");
+const DAYS_ALL = [
+  {key:"Monday",label:"Lundi"},{key:"Tuesday",label:"Mardi"},{key:"Wednesday",label:"Mercredi"},
+  {key:"Thursday",label:"Jeudi"},{key:"Friday",label:"Vendredi"},{key:"Saturday",label:"Samedi"},{key:"Sunday",label:"Dimanche"},
+];
+
+// génère des options HH:MM de 08:00 à 19:00 (tu peux ajuster)
+function buildTimeOptions(step=15, start="08:00", end="19:00"){
+  const toMin = s=>{const [H,M]=s.split(":").map(Number); return H*60+M;}
+  const toHHMM = m=>String(m/60|0).padStart(2,"0")+":"+String(m%60).padStart(2,"0");
+  const out=[];
+  for(let t=toMin(start); t<=toMin(end); t+=step) out.push(toHHMM(t));
+  return out;
+}
+const TIME_OPTS = buildTimeOptions(15);
+
+// helpers de (dé)serialization => même format que ton back: "HH:MM" ou "HH:MM–HH:MM"
+const joinRange = (a,b)=> a===b ? a : `${a}–${b}`;
+function toLines(arr){ return (arr||[]).map(x=>typeof x==="string"?x:(x.non?`! ${x.t}`:x.t)).join("\n"); }
+
+// fabrique un chip visuel
+function makeChip(text, onRemove){
+  const el=document.createElement("span");
+  el.className="slot-chip";
+  el.innerHTML=`<b>${text}</b> <span class="x">✕</span>`;
+  el.querySelector(".x").onclick=onRemove;
+  return el;
+}
+
+function renderDaysGrid(seedDays){
+  daysWrap.innerHTML = "";
+  const daysConfig  = seedDays || (CONFIG?.days || {});
+  const visibleDays = (OPEN_DAYS.length ? OPEN_DAYS : ALL_DAYS);
+
+  visibleDays.forEach(dayKey => {
+    const d = { key: dayKey, label: DAY_LABEL[dayKey] || dayKey };
+
+    const card = document.createElement("div");
+    card.dataset.day = d.key; // Monday / Tuesday / ...
+    card.className = "day-card";
+    card.tabIndex = 0;
+    card.addEventListener("click", () => {
+  const sel = document.getElementById("qaDay");
+  if (sel) sel.value = d.key;          // sync le select
+  highlightSelectedDay(d.key);         // applique l’effet
+});
+
+
+
+    // bloc outils + liste par service
+    const rows = SERVICES.map(s=>{
+      const id = `${d.key}-${s.key}`;
+      const slotList = document.createElement("div");
+      slotList.className = "slot-list";
+      slotList.id = `list-${id}`;
+
+      const startSel = document.createElement("select");
+      const endSel   = document.createElement("select");
+      TIME_OPTS.forEach(t=>{
+        startSel.add(new Option(t,t));
+        endSel.add(new Option(t,t));
+      });
+
+      const dur = s.durationMin || 30;
+      startSel.onchange = ()=>{
+        const [H,M]=startSel.value.split(":").map(Number);
+        const dt=new Date(2000,0,1,H,M,0);
+        dt.setMinutes(dt.getMinutes()+dur);
+        const hh=String(dt.getHours()).padStart(2,"0");
+        const mm=String(dt.getMinutes()).padStart(2,"0");
+        endSel.value = `${hh}:${mm}`;
+      };
+      startSel.value = "11:30"; startSel.onchange();
+
+      const addBtn = document.createElement("button");
+      addBtn.textContent = "➕ Ajouter";
+      addBtn.onclick = ()=>{
+        const a=startSel.value, b=endSel.value;
+        const text = joinRange(a,b);
+        const store = card._store[id] || (card._store[id]=[]);
+        if (!store.some(x => (x.t||x)===text)) {
+          store.push(text);
+          refreshList(id, slotList, store);
+          saveUI();
+        }
+      };
+
+      const tools = document.createElement("div");
+      tools.className="slot-tools";
+      tools.innerHTML = `<label>${s.label} ${s.grey?'<span class="tag">grisé</span>':''}</label>`;
+      tools.appendChild(startSel);
+      tools.appendChild(document.createTextNode("→"));
+      tools.appendChild(endSel);
+      tools.appendChild(addBtn);
+
+      const wrap = document.createElement("div");
+      wrap.appendChild(tools);
+      wrap.appendChild(slotList);
+
+      const seed = (daysConfig[d.key]?.[s.key]) || [];
+      card._store = card._store || {};
+      card._store[id] = JSON.parse(JSON.stringify(seed));
+      refreshList(id, slotList, card._store[id]);
+
+      return wrap;
+    });
+
+    card.innerHTML = `<p class="day-title">${d.label}</p>`;
+    rows.forEach(r=>card.appendChild(r));
+    daysWrap.appendChild(card);
+  });
+
+  const first = daysWrap.querySelector(".day-card");
+  if (first) first.classList.add("active");
+  highlightSelectedDay(); // sélectionne la carte correspondant au select
+
+}
+
+
+// rafraîchit l’affichage des chips pour un service d’un jour
+function refreshList(id, listEl, store){
+  listEl.innerHTML="";
+  (store||[]).forEach((it,idx)=>{
+    const text = (typeof it==="string") ? it : ("! "+it.t);
+    listEl.appendChild(
+      makeChip(text, ()=>{
+        store.splice(idx,1);
+        refreshList(id, listEl, store);
+      })
+    );
+  });
+}
+
+// lit les slots depuis l’UI (store embarqué sur chaque carte)
+function readDaysFromUI(){
+  const out = {};
+  daysWrap.querySelectorAll(".day-card").forEach(card=>{
+    const dayKey = card.dataset.day;   // ✅ Monday / Tuesday / ...
+    if (!dayKey) return;
+    const obj = {};
+    SERVICES.forEach(s=>{
+      const id = `${dayKey}-${s.key}`;
+      obj[s.key] = (card._store && card._store[id]) ? card._store[id] : [];
+    });
+    out[dayKey] = obj;
+  });
+  return out;
+}
+
+// === garde l'état courant de l'UI comme seed pour re-render ===
+function getSeedDays(){
+  try {
+    return readDaysFromUI();        // ce qu'il y a à l'écran (chchips)
+  } catch {
+    return CONFIG?.days || {};      // fallback
+  }
+}
+
+// remplir les quick selects
+(function initQuick(){
+  const start = document.getElementById("quickStart");
+  const end   = document.getElementById("quickEnd");
+  const step  = document.getElementById("quickStep");
+  const svcSel= document.getElementById("quickService");
+  const qaDaySel = document.getElementById("qaDay");
+if (qaDaySel) {
+  qaDaySel.addEventListener("change", () => highlightSelectedDay());
+}
+
+
+  // options d’horaires
+  TIME_OPTS.forEach(t=>{ start.add(new Option(t,t)); end.add(new Option(t,t)); });
+  start.value="11:00"; end.value="15:00";
+
+  document.getElementById("quickApply").onclick = ()=>{
+    const dayKey = qaDaySel.value || OPEN_DAYS[0] || ALL_DAYS[0];
+    const card = [...daysWrap.querySelectorAll(".day-card")].find(c => c.dataset.day === dayKey);
+    if (!card) { alert("Aucune carte pour ce jour."); return; }
+
+    const a = start.value, b = end.value, n = +step.value || 30;
+
+    const toMin=s=>{const[H,M]=s.split(":").map(Number);return H*60+M};
+    const toHHMM=m=>String((m/60|0)).padStart(2,"0")+":"+String(m%60).padStart(2,"0");
+    const A=toMin(a), B=toMin(b);
+
+    const targetServices = (svcSel && svcSel.value && svcSel.value !== "*")
+      ? SERVICES.filter(s=>s.key===svcSel.value)
+      : SERVICES.filter(s=>!s.grey);
+
+    card._store = card._store || {};
+    targetServices.forEach(s=>{
+      const id = `${dayKey}-${s.key}`;
+      const store = (card._store[id] ||= []);
+      for(let t=A; t<=B; t+=n){
+        const startHH = toHHMM(t);
+        // fin = start + durée du service
+        const d = new Date(2000,0,1, ...startHH.split(":").map(Number));
+        d.setMinutes(d.getMinutes() + (s.durationMin || 30));
+        const endHH = toHHMM(d.getHours()*60 + d.getMinutes());
+        const text = (startHH===endHH) ? startHH : `${startHH}–${endHH}`;
+        if (!store.some(x => (x.t||x)===text)) store.push(text);
+      }
+    });
+	  saveUI();       // ✅ met à jour UI_DAYS avec ce que tu viens d’ajouter
+rerender();     // ✅ réaffiche depuis la copie locale
+daysWrap.querySelectorAll(".day-card").forEach(c=>{
+  if (c.dataset.day === dayKey) c.classList.add("active");
+});
+  };
+})();
+const blocksList=document.getElementById("blocksList");
+
+function renderBlocks(){
+  blocksList.innerHTML="";
+  (CONFIG.blocks||[]).forEach((b,idx)=>{
+    const row=document.createElement("div"); row.className="service";
+    const svc=SERVICES.find(s=>s.key===b.service);
+    row.innerHTML=`
+      <div><b>${b.date}</b> -${svc?svc.label:b.service} - ${b.slot}</div>
+      <button data-delblock="${idx}" title="Supprimer">🗑️</button>
+    `;
+    blocksList.appendChild(row);
+  });
+  blocksList.querySelectorAll("[data-delblock]").forEach(btn=>{
+    btn.onclick=()=>{ CONFIG.blocks.splice(+btn.getAttribute("data-delblock"),1); renderBlocks(); };
+  });
+}
+
+document.getElementById("addBlock").onclick=()=>{
+  const date=document.getElementById("blockDate").value;
+  const service=document.getElementById("blockService").value;
+  const slot=document.getElementById("blockSlot").value;
+  if(!date||!slot){ alert("Date et heure requises"); return; }
+  CONFIG.blocks=CONFIG.blocks||[];
+  CONFIG.blocks.push({date,service,slot});
+  renderBlocks();
+};
+
+// remplir select services
+
+function fillQuickServices(){
+  const sel = document.getElementById("quickService");
+  if (!sel) return;
+  sel.innerHTML = `<option value="*">Tous les services réservables</option>` +
+    SERVICES.map(s => `<option value="${s.key}">${s.label}${s.grey?' (grisé)':''}</option>`).join("");
+}
+
+function fillBlockServices(){
+  const sel=document.getElementById("blockService");
+  sel.innerHTML=`<option value="*">Tous services</option>`+
+    SERVICES.map(s=>`<option value="${s.key}">${s.label}</option>`).join("");
+}
+
+function fillMailForm(mail){
+  const m = mail || {};
+  document.getElementById('mail_from').value = m.from || '';
+  document.getElementById('mail_responsible').value = m.responsible || '';
+
+  document.getElementById('mail_subject_user').value = m.subject_user || '';
+  document.getElementById('mail_body_user').value = m.body_user || '';
+
+  document.getElementById('mail_subject_service').value = m.subject_service || '';
+  document.getElementById('mail_body_service').value = m.body_service || '';
+
+  document.getElementById('mail_cancel_subject_user').value = m.cancel_subject_user || '';
+  document.getElementById('mail_cancel_body_user').value = m.cancel_body_user || '';
+
+  document.getElementById('mail_cancel_subject_service').value = m.cancel_subject_service || '';
+  document.getElementById('mail_cancel_body_service').value = m.cancel_body_service || '';
+}
+
+function readMailForm(){
+  return {
+    from: document.getElementById('mail_from').value.trim(),
+    responsible: document.getElementById('mail_responsible').value.trim(),
+
+    subject_user: document.getElementById('mail_subject_user').value,
+    body_user: document.getElementById('mail_body_user').value,
+
+    subject_service: document.getElementById('mail_subject_service').value,
+    body_service: document.getElementById('mail_body_service').value,
+
+    cancel_subject_user: document.getElementById('mail_cancel_subject_user').value,
+    cancel_body_user: document.getElementById('mail_cancel_body_user').value,
+
+    cancel_subject_service: document.getElementById('mail_cancel_subject_service').value,
+    cancel_body_service: document.getElementById('mail_cancel_body_service').value,
+  };
+}
+
+/* ===== Collecte + Save ===== */
+
+function collectConfig(){
+  const closed = parseClosedRangesText(document.getElementById("closed").value);
+  const days = readDaysFromUI();
+
+  return {
+    services: SERVICES,
+    closed,
+    days,
+    blocks: CONFIG.blocks || [],
+    openDays: OPEN_DAYS && OPEN_DAYS.length ? OPEN_DAYS.slice() : ALL_DAYS.slice(),
+    ...(window.IS_SUPER ? { mail: readMailForm() } : {})
+  };
+}
+document.getElementById("saveBtn").onclick=async()=>{
+  const cfg=collectConfig();
+  try{
+    const r=await fetch(`${API_BASE}/api/config`,{
+      method:"PUT",
+      headers:{ "Content-Type":"application/json","X-Admin-Secret":ADMIN_SECRET },
+      body: JSON.stringify(cfg)
+    });
+    if(!r.ok) throw 0;
+    alert("✅ Configuration enregistrée.");
+    CONFIG=cfg;
+  }catch{ alert("❌ Erreur d’enregistrement."); }
+};
+
+/* ===== Init ===== */
+
+async function whoAmI(){
+  try{
+    const r = await fetch("/api/me", { cache:"no-store" });
+    if (!r.ok) return { admin:false, super:false }; // <- défaut propre si 404/401/etc.
+    const data = await r.json();
+    // adapte si ton API renvoie une autre forme
+    return { admin: !!data.admin, super: !!data.super };
+  }catch{
+    return { admin:false, super:false };
+  }
+}
+
+function renderOpenDays() {
+  const wrap = document.getElementById("openDaysChips");
+  wrap.innerHTML = "";
+  ALL_DAYS.forEach(key => {
+    const on = OPEN_DAYS.includes(key);
+    const btn = document.createElement("button");
+    btn.className = "chip " + (on ? "chip-on" : "chip-off");
+    btn.type = "button";
+    btn.setAttribute("aria-pressed", on ? "true" : "false");
+    btn.textContent = DAY_LABEL[key] || key;
+
+    btn.onclick = () => {
+      if (OPEN_DAYS.includes(key)) {
+        OPEN_DAYS = OPEN_DAYS.filter(k => k !== key);
+      } else {
+        OPEN_DAYS = [...OPEN_DAYS, key];
+      }
+      // garder l’ordre canonique
+      OPEN_DAYS = ALL_DAYS.filter(k => OPEN_DAYS.includes(k));
+      renderOpenDays();
+      fillQaDay();        // MAJ du select “Jour” de la plage rapide
+      rerender();         // MAJ cartes jour (masque les fermés)
+    };
+
+    wrap.appendChild(btn);
+  });
+}
+
+// remplit le select "Jour :" au-dessus du bouton ➕
+function fillQaDay() {
+  const sel = document.getElementById("qaDay");
+  sel.innerHTML = "";
+  OPEN_DAYS.forEach(k => sel.add(new Option(DAY_LABEL[k] || k, k)));
+  // si rien de coché, on laisse tous pour éviter une UI “morte”
+  if (!sel.options.length) ALL_DAYS.forEach(k => sel.add(new Option(DAY_LABEL[k] || k, k)));
+  highlightSelectedDay();
+}
+
+// petit fallback pour CSS.escape sur vieux navigateurs
+if (!window.CSS || !CSS.escape) {
+  window.CSS = window.CSS || {};
+  CSS.escape = s => String(s).replace(/[^a-zA-Z0-9_-]/g, ch => "\\" + ch);
+}
+
+function highlightSelectedDay(forceKey) {
+  const key = forceKey || (document.getElementById("qaDay")?.value);
+  // on nettoie toutes les cartes
+  document.querySelectorAll(".day-card").forEach(c =>
+    c.classList.remove("active", "active-select", "is-selected")
+  );
+  const card = document.querySelector(`.day-card[data-day="${CSS.escape(key)}"]`);
+  if (!card) return;
+
+  // si un re-render arrive juste après, rejoue une frame plus tard
+  card.classList.add("is-selected");
+  requestAnimationFrame(() => {
+    // protection supplémentaire si le DOM a bougé
+    const again = document.querySelector(`.day-card[data-day="${CSS.escape(key)}"]`);
+    if (again) again.classList.add("is-selected");
+  });
+}
+// Écouteur automatique
+document.getElementById("qaDay").addEventListener("change", highlightSelectedDay);
+
+	
+(async function(){
+  const r=await fetch(`${API_BASE}/api/config`); if(!r.ok) return alert("Erreur chargement config");
+  CONFIG=await r.json();
+  OPEN_DAYS = Array.isArray(CONFIG.openDays) && CONFIG.openDays.length
+  ? ALL_DAYS.filter(k => CONFIG.openDays.includes(k)) // ordre canonique
+  : [...ALL_DAYS];
+
+renderOpenDays();
+fillQaDay();
+  const me = await whoAmI();
+window.IS_SUPER = !!me.super;
+
+const mailSec = document.getElementById("mailSec");
+  mailSec.classList.add("hidden");
+  if (Array.isArray(CONFIG.services)) {
+    SERVICES = JSON.parse(JSON.stringify(CONFIG.services));
+  } else {
+    const L=CONFIG.labels||{amma:"Massage AMMA Assis",rv:"Réalité Virtuelle",lumo:"Luminothérapie",doin:"Do In"};
+    const C=CONFIG.capacities||{amma:1,rv:1,lumo:2};
+    SERVICES=[
+      {key:"amma",label:L.amma,capacity:C.amma??1,grey:false},
+      {key:"rv",  label:L.rv,  capacity:C.rv??1,  grey:false},
+      {key:"lumo",label:L.lumo,capacity:C.lumo??2,grey:false},
+      {key:"doin",label:L.doin,capacity:0,grey:true}
+    ];
+  }
+  document.getElementById("closed").value = closedRangesToText(CONFIG.closed||[]);
+UI_DAYS = JSON.parse(JSON.stringify(CONFIG.days || {}));   // ✅ deep clone
+document.getElementById("closed").value = closedRangesToText(CONFIG.closed || []);
+renderServices();
+renderDaysGrid(UI_DAYS);                                    // 🔁 passe la copie locale
+fillQuickServices();
+fillBlockServices();
+renderBlocks();
+})();
 </script>
 </body>
 </html>
-
 
